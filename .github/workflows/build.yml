@@ -1,0 +1,56 @@
+name: Construire l'APK VELO SPEED
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Si le projet a été envoyé sous forme d'une archive « projet.zip » (envoi depuis un téléphone),
+      # on la décompresse à la racine avant de compiler.
+      - name: Décompresser projet.zip si présent
+        run: |
+          if [ -f projet.zip ] && [ ! -f settings.gradle.kts ]; then
+            unzip -o projet.zip
+            if [ ! -f settings.gradle.kts ]; then
+              d=$(find . -maxdepth 2 -name settings.gradle.kts -printf '%h\n' | head -1)
+              [ -n "$d" ] && cp -a "$d"/. . 
+            fi
+          fi
+          ls
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Compiler (debug, signé avec la clé du projet)
+        run: gradle assembleDebug --no-daemon --stacktrace
+
+      - name: Renommer l'APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk VELO-SPEED.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VELO-SPEED-apk
+          path: VELO-SPEED.apk
+
+      - name: Publier une version téléchargeable depuis le téléphone
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v2.0.0-build${{ github.run_number }}"
+          gh release create "$tag" VELO-SPEED.apk --title "VELO SPEED $tag" \
+            --notes "APK de test. Installer : télécharger VELO-SPEED.apk puis l'ouvrir (autoriser les sources inconnues)."

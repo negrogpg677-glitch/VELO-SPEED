@@ -21,7 +21,7 @@ Coque Kotlin native + interface web locale (WebView) : compteur GPS, trajets, m�
 
 Rien n'est inventé : aucun identifiant Bluetooth du A13 n'est codé en dur.
 
-Détail de la compatibilité Bluetooth : `docs/COMPATIBILITE_BLE.md` · étude sur la limitation de vitesse : `docs/ETUDE_LIMITATION.md` · analyse des captures : `docs/ANALYSE_CAPTURES.md` · test sur Nothing Phone (1) : `docs/TEST_NOTHING_PHONE.md` · version iPhone (plus tard) : `docs/PLAN_IOS.md`.
+Détail de la compatibilité Bluetooth : `docs/COMPATIBILITE_BLE.md` · étude sur la limitation de vitesse : `docs/ETUDE_LIMITATION.md` · analyse des captures de l'appli officielle : `docs/ANALYSE_CAPTURES.md`.
 
 ## Obtenir la vitesse réelle et les limites
 1. Onglet **Mon vélo → Labo** : « Rapport de diagnostic » → partage-le (il liste les services et valeurs du vélo).
@@ -29,10 +29,7 @@ Détail de la compatibilité Bluetooth : `docs/COMPATIBILITE_BLE.md` · étude s
 3. Pour les limites : capture HCI de l'appli officielle YouFs (voir `docs/PROFIL.md`), puis import d'un profil.
 
 ## Sécurité et réglementation
-Au-delà de **25 km/h** d'assistance, un vélo n'est plus un VAE légal (cyclomoteur : immatriculation, assurance, casque). Usage **uniquement sur terrain privé fermé**. Chaque écriture exige une confirmation explicite, un **mode lecture seule est actif par défaut** (aucune écriture), et une sauvegarde des valeurs avant modification existe (« Restaurer la sauvegarde »), et chaque écriture est relue pour vérification. Tu restes responsable de l'usage.
-
-## État de vérification (2.1.0)
-Kotlin **relu, jamais compilé** ; APK **jamais construit ici** ; tests = simulateur JS uniquement. Détails : `docs/AUDIT.md`.
+Au-delà de **25 km/h** d'assistance, un vélo n'est plus un VAE légal (cyclomoteur : immatriculation, assurance, casque). Usage **uniquement sur terrain privé fermé**. Chaque écriture exige une confirmation explicite, une sauvegarde des valeurs d'origine existe (« Restaurer l'origine »), et chaque écriture est relue pour vérification. Tu restes responsable de l'usage.
 
 ## Compilation
 JDK 17, Gradle 8.7, AGP 8.5.2, Kotlin 1.9.24, compileSdk/targetSdk 34, minSdk 23, `applicationId fr.velospeed.a13`. Clé de signature fixe (`app/velo-debug.jks`) : les mises à jour s'installent par-dessus. Clé de test : à remplacer pour toute diffusion publique.
