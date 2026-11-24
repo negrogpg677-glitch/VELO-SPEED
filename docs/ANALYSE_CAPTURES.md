@@ -37,3 +37,17 @@ Les captures proviennent d'un **iPhone**. VELO SPEED est Android uniquement. Il 
 1. Installer l'APK sur un Android, scanner le vélo allumé, lire le contrôle de compatibilité (signature Tuya oui / non).
 2. Générer le rapport de diagnostic (services, annonce brute).
 3. Selon le résultat : (a) pas de signature Tuya → assistant d'analyse et capture HCI ; (b) signature Tuya → décider si on implémente le protocole Tuya BLE avec la clé locale de ton compte, ou si on se limite au compteur GPS.
+
+## 6. Relevé nRF Connect du vélo « demo » (24/11/2026) — Tuya CONFIRMÉ
+Le vélo s'annonce sous le nom **« demo »** (adresse Android vue : DC:23:52:93:CF:A7).
+- **Données constructeur** : identifiant **0x07D0 = Hangzhou Tuya Information Technology** — `00 00 01 00 F2 4E 0D EF 35 85 51 7C 31 D0 1C 4F 2D 58 29 7A`.
+- **Service annoncé** : **0xFD50** (service Bluetooth attribué à Tuya) ; données de service `41 04 00 08` + `7A 36 74 6C 77 73 6D 71` = identifiant produit Tuya probable **« z6tlwsmq »**.
+- **Services GATT** : 1800, 1801 et **FD50** avec trois caractéristiques :
+  - `00000001-0000-1001-8001-00805f9b07d0` : écriture (avec / sans réponse) ;
+  - `00000002-0000-1001-8001-00805f9b07d0` : notifications (CCCD 2902) ;
+  - `00000003-0000-1001-8001-00805f9b07d0` : lecture.
+- Pas de DFU Nordic / McuMgr (normal).
+
+**Conclusion** : c'est le protocole **Tuya BLE récent** (service FD50, pas l'ancien 0x1910). nRF Connect affiche « Connected » pour la même raison que VELO SPEED : seule la liaison radio est ouverte. Le vélo n'affiche le logo Bluetooth et n'envoie la vitesse qu'après l'authentification chiffrée (AES-128), qui exige l'**identifiant de l'appareil, son UUID et sa clé locale** (compte propriétaire, cloud Tuya). Ce format correspond à celui géré par l'intégration communautaire Home Assistant « tuya_ble ».
+
+L'appli (v2.0.2) reconnaît désormais FD50 comme signature Tuya et n'affiche plus « Connecté » à tort pour ce vélo.

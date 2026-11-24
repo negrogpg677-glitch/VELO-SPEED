@@ -218,7 +218,8 @@
     VS.refresh("scan");
   });
   /* Signature « Tuya » (documentation publique du SDK BLE Tuya) : service annoncé 0xA201 ou données constructeur 0x07D0 ;
-     après connexion : service GATT 0x1910. Ce n'est qu'une SIGNATURE : elle ne prouve pas que l'A13 est un produit Tuya. */
+     après connexion : service GATT 0x1910 (ancien protocole) ou 0xFD50 (protocole Tuya BLE récent, observé sur le vélo
+     « demo » avec nRF Connect le 24/11/2026 : caractéristiques 00000001/2/3-0000-1001-8001-00805f9b07d0). Ce n'est qu'une SIGNATURE : elle ne prouve pas que l'A13 est un produit Tuya. */
   VS.adStructs = function (hex) {
     const b = Array.prototype.slice.call(L.hexToBytes(hex || "")), out = [];
     for (let i = 0; i < b.length;) { const n = b[i]; if (!n) break; out.push({ t: b[i + 1], d: b.slice(i + 2, i + 1 + n) }); i += n + 1; }
@@ -226,10 +227,10 @@
   };
   VS.isTuyaAdv = function (e) {
     if (!e) return false;
-    if ((e.services || []).some(function (u) { return String(u).indexOf("0000a201-") === 0; })) return true;
+    if ((e.services || []).some(function (u) { u = String(u); return u.indexOf("0000a201-") === 0 || u.indexOf("0000fd50-") === 0; })) return true;
     return VS.adStructs(e.adv).some(function (a) { return a.t === 0xFF && a.d.length >= 2 && a.d[0] === 0xD0 && a.d[1] === 0x07; });
   };
-  VS.isTuyaGatt = function () { return (S.services || []).some(function (s) { return String(s.uuid).indexOf("00001910-") === 0; }); };
+  VS.isTuyaGatt = function () { return (S.services || []).some(function (s) { const u = String(s.uuid); return u.indexOf("00001910-") === 0 || u.indexOf("0000fd50-") === 0; }); };
   /* Liaison radio ouverte mais vélo Tuya non authentifié : le vélo ne se considère PAS connecté (pas de logo Bluetooth, pas de données). */
   VS.linkOnly = function () { return S.conn.state === "connected" && VS.isTuyaGatt(); };
   VS.isLikelyBike = function (name) {
@@ -292,7 +293,7 @@
     });
     VS.log(S.services.length + " service(s), " + Object.keys(S.chars).length + " caractéristique(s)");
     armAfterServices();
-    if (VS.isTuyaGatt()) { VS.log("Service Tuya 0x1910 : le vélo attend une authentification chiffrée. Liaison radio seulement, le vélo ne se considère pas connecté."); VS.toast("Vélo Tuya : liaison radio seulement, le vélo ne valide pas la connexion."); }
+    if (VS.isTuyaGatt()) { VS.log("Service Tuya (0x1910 ou 0xFD50) : le vélo attend une authentification chiffrée. Liaison radio seulement, le vélo ne se considère pas connecté."); VS.toast("Vélo Tuya : liaison radio seulement, le vélo ne valide pas la connexion."); }
     VS.refresh("services");
   });
   VS.findChar = function (chr) {

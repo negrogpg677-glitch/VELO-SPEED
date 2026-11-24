@@ -11,8 +11,8 @@ android {
         applicationId = "fr.velospeed.a13"
         minSdk = 23          // Android 6.0
         targetSdk = 34       // Android 14 (fonctionne aussi sur Android 15)
-        versionCode = 3
-        versionName = "2.0.1"
+        versionCode = 4
+        versionName = "2.0.2"
     }
 
     // Clé de signature fixe, propre à ce projet personnel : elle permet de mettre à jour l'appli

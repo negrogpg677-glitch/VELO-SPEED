@@ -158,7 +158,7 @@
     const backup = VS.store.get(BKEY, null);
     const nRead = Object.keys(S.limits).length;
     const rows = [
-      ["Protocole confirmé par une capture réelle", VS.limitsWritable(), VS.limitsWritable() ? "Profil « confirmé »." : (VS.isTuyaGatt() ? "NON CONFIRMÉ : service Tuya (0x1910) présent : échanges chiffrés, profil en clair inapplicable." : "NON CONFIRMÉ : aucun profil validé pour l'A13.")],
+      ["Protocole confirmé par une capture réelle", VS.limitsWritable(), VS.limitsWritable() ? "Profil « confirmé »." : (VS.isTuyaGatt() ? "NON CONFIRMÉ : service Tuya (0x1910 ou 0xFD50) présent : échanges chiffrés, profil en clair inapplicable." : "NON CONFIRMÉ : aucun profil validé pour l'A13.")],
       ["Bornes de sécurité du profil", lim.min >= 0 && lim.max <= 60 && lim.min < lim.max, "De " + lim.min + " à " + lim.max + " km/h."],
       ["Vélo connecté", conn, conn ? "Oui." : "Connexion requise."],
       ["Lecture des " + lim.levels + " niveaux réussie", nRead >= lim.levels, nRead >= lim.levels ? "Valeurs actuelles connues." : nRead + " niveau(x) lu(s) sur " + lim.levels + "."],
