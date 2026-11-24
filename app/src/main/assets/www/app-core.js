@@ -230,6 +230,8 @@
     return VS.adStructs(e.adv).some(function (a) { return a.t === 0xFF && a.d.length >= 2 && a.d[0] === 0xD0 && a.d[1] === 0x07; });
   };
   VS.isTuyaGatt = function () { return (S.services || []).some(function (s) { return String(s.uuid).indexOf("00001910-") === 0; }); };
+  /* Liaison radio ouverte mais vélo Tuya non authentifié : le vélo ne se considère PAS connecté (pas de logo Bluetooth, pas de données). */
+  VS.linkOnly = function () { return S.conn.state === "connected" && VS.isTuyaGatt(); };
   VS.isLikelyBike = function (name) {
     if (!name) return false;
     const n = name.toLowerCase();
@@ -266,7 +268,7 @@
     else if (d.state === "connected") {
       S.conn = { state: "connected", name: d.name || S.conn.name, address: d.address || S.conn.address, bond: d.bond, type: d.type };
       S.retries = 0; VS.log("Connecté à " + (S.conn.name || S.conn.address) + " — découverte des services…");
-      VS.toast("Connecté au vélo");
+      VS.toast("Liaison Bluetooth ouverte — vérification du vélo…");
     } else {
       const wasUser = S.userDisc, addr = d.address || S.conn.address;
       const wasConnected = d.state === "disconnected";
@@ -290,6 +292,7 @@
     });
     VS.log(S.services.length + " service(s), " + Object.keys(S.chars).length + " caractéristique(s)");
     armAfterServices();
+    if (VS.isTuyaGatt()) { VS.log("Service Tuya 0x1910 : le vélo attend une authentification chiffrée. Liaison radio seulement, le vélo ne se considère pas connecté."); VS.toast("Vélo Tuya : liaison radio seulement, le vélo ne valide pas la connexion."); }
     VS.refresh("services");
   });
   VS.findChar = function (chr) {

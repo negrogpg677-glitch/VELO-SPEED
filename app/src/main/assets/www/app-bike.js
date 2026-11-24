@@ -63,7 +63,7 @@
     else if (bonded.some(function (d) { return d.type === 1; })) add("Vélo détecté", "bad", "Appairé en Bluetooth CLASSIQUE (« " + bonded[0].name + " ») : invisible au scan BLE. VELO SPEED ne sait pas lui parler.");
     else add("Vélo détecté", c.state === "connected" ? "ok" : "todo", c.state === "connected" ? "Connecté." : "Lancer la recherche, vélo allumé, appli officielle fermée.");
     if (likely) add("Vélo connectable (BLE)", likely.connectable === false ? "bad" : "ok", likely.connectable === false ? "L'annonce indique « non connectable »." : "Oui" + (likely.type === 3 ? " (double mode)" : "") + ".");
-    add("Connexion GATT", c.state === "connected" ? "ok" : "todo", c.state === "connected" ? "Établie" + (c.bond === 12 ? " · appairé" : " · sans appairage") + (S.mtu ? " · MTU " + S.mtu : "") + "." : "Pas encore connecté.");
+    add("Connexion GATT", c.state === "connected" ? "ok" : "todo", c.state === "connected" ? (VS.isTuyaGatt() ? "Liaison radio établie, mais le vélo Tuya n'accepte pas de session sans authentification chiffrée" : "Établie") + (c.bond === 12 ? " · appairé" : " · sans appairage") + (S.mtu ? " · MTU " + S.mtu : "") + "." : "Pas encore connecté.");
     const tuyaAdv = all.some(function (d) { return VS.isTuyaAdv(d) && (VS.isLikelyBike(d.name) || d.address === c.address); }), tuya = tuyaAdv || VS.isTuyaGatt();
     add("Protocole en clair (sans chiffrement)", tuya ? "bad" : "unconf", tuya ? "Signature Tuya détectée : trames chiffrées, clé du compte propriétaire requise. Le profil en clair ne peut pas fonctionner." : "NON CONFIRMÉ : signature Tuya non observée pour l'instant (lancer un scan vélo allumé).");
     add("Services découverts", S.services.length ? "ok" : "todo", S.services.length ? S.services.length + " service(s)." : "Aucun (connexion requise).");
@@ -83,7 +83,8 @@
     const c = S.conn, p = VS.profile, sp = p.speed;
     let state;
     if (c.state === "connected") {
-      state = '<div class="row sp"><div><h2>' + esc(c.name || "Appareil") + '</h2><div class="note">' + esc(c.address) + '</div></div><span class="chip ok"><span class="dot"></span>Connecté</span></div>' +
+      state = '<div class="row sp"><div><h2>' + esc(c.name || "Appareil") + '</h2><div class="note">' + esc(c.address) + '</div></div>' + (VS.linkOnly() ? '<span class="chip warn"><span class="dot"></span>Liaison radio seulement</span>' : '<span class="chip ok"><span class="dot"></span>Connecté</span>') + '</div>' +
+        (VS.linkOnly() ? '<div class="box sun" style="margin-top:10px"><b>Le vélo ne valide pas cette connexion.</b> Il utilise le protocole Tuya chiffré : tant que l\'appli ne s\'authentifie pas avec la clé locale de ton compte, le vélo n\'affiche pas le logo Bluetooth et n\'envoie ni vitesse ni batterie. Le compteur utilise le GPS du téléphone.</div>' : '') +
         '<div class="grid2" style="margin-top:10px"><div class="stat mint"><small>Batterie</small><b class="num">' + (S.battery == null ? "—" : S.battery + " <i>%</i>") + '</b></div><div class="stat sky"><small>Vitesse reçue</small><b class="num" id="liveBle">—</b></div></div>' +
         '<div class="row" style="margin-top:12px"><button class="btn sec" data-act="bike-disc">Déconnecter</button></div>';
     } else if (c.state === "connecting") {

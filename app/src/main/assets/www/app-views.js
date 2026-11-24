@@ -122,8 +122,8 @@
     lim.className = "lim" + (over ? " over" : "");
     $("#rideSub").textContent = ride.run ? "Trajet en cours · " + Math.round(ride.total / 60) + " min" : ride.started ? "Trajet en pause" : "Prêt";
     const cs = S.conn.state, bat = S.battery == null ? "" : " · " + S.battery + " %";
-    $("#chBle").innerHTML = '<span class="dot"></span>' + (cs === "connected" ? "Vélo connecté" + bat : cs === "connecting" ? "Bluetooth : connexion…" : "Bluetooth : non connecté");
-    $("#chBle").className = "chip " + (cs === "connected" ? "ok" : cs === "connecting" ? "warn" : "");
+    $("#chBle").innerHTML = '<span class="dot"></span>' + (cs === "connected" ? (VS.linkOnly() ? "Vélo : liaison non validée" : "Vélo connecté" + bat) : cs === "connecting" ? "Bluetooth : connexion…" : "Bluetooth : non connecté");
+    $("#chBle").className = "chip " + (cs === "connected" ? (VS.linkOnly() ? "warn" : "ok") : cs === "connecting" ? "warn" : "");
     $("#chSrc").textContent = "Source : " + s.src.toLowerCase();
     const g = S.live.gps, gOk = g && Date.now() - g.t < 5000;
     $("#chGps").innerHTML = '<span class="dot"></span>' + (S.gpsOn ? (gOk ? "GPS ± " + Math.round(g.acc || 0) + " m" : "GPS : recherche…") : "GPS éteint");
